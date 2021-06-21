@@ -30,6 +30,12 @@ class ServiceProvider(Partner):
         self.issued_invoices = []
 
     def issue_invoice(self, customer, service_amount):
+        """
+        Issues an invoice to a customer and
+        stores it in issued_invoices field
+        """
+        if not isinstance(customer, Partner):
+            raise TypeError("Customer must be an object derived from partner class")
         invoice = Invoice(self, customer, service_amount)
         self.issued_invoices.append(invoice)
         return invoice
