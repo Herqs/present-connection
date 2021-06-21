@@ -12,6 +12,19 @@ class TestInvoice(unittest.TestCase):
         self.assertAlmostEqual(invoice.vat, tax)
         self.assertAlmostEqual(invoice.total, 15.2 + tax)
 
+        customer.is_vat_payer = True
+        invoice = service_provider.issue_invoice(customer=customer, service_amount=15.2)
+        self.assertAlmostEqual(invoice.vat, tax)
+        self.assertAlmostEqual(invoice.total, 15.2 + tax)
+
+    def test_free_service(self):
+        service_provider = ServiceProvider(is_vat_payer=True, country=HelperCountry.LITHUANIA)
+        customer = Customer(is_vat_payer=False, country=HelperCountry.LITHUANIA, legal_entity=False)
+
+        invoice = service_provider.issue_invoice(customer=customer, service_amount=0)
+        self.assertAlmostEqual(invoice.vat, 0)
+        self.assertAlmostEqual(invoice.total, 0)
+
     def test_non_eu(self):
         service_provider = ServiceProvider(is_vat_payer=True, country=HelperCountry.LITHUANIA)
         customer = Customer(is_vat_payer=False, country=HelperCountry.USA, legal_entity=False)
@@ -47,3 +60,4 @@ class TestInvoice(unittest.TestCase):
         service_provider = ServiceProvider(is_vat_payer=True, country=HelperCountry.LITHUANIA)
         customer = Customer(is_vat_payer=False, country=HelperCountry.LATVIA, legal_entity=False)
         self.assertRaises(ValueError, service_provider.issue_invoice, customer, -42)
+
